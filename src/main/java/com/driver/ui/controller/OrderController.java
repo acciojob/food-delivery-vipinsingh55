@@ -1,49 +1,64 @@
-package com.driver.ui.controller;
+package com.example.fooddelivery.controller;
+
+import com.example.fooddelivery.model.Order;
+import com.example.fooddelivery.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import com.driver.model.request.OrderDetailsRequestModel;
-import com.driver.model.response.OperationStatusModel;
-import com.driver.model.response.OrderDetailsResponse;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
-	@GetMapping(path="/{id}")
-	public OrderDetailsResponse getOrder(@PathVariable String id) throws Exception{
 
-		return null;
-	}
-	
-	@PostMapping()
-	public OrderDetailsResponse createOrder(@RequestBody OrderDetailsRequestModel order) {
-		
-		return null;
-	}
-		
-	@PutMapping(path="/{id}")
-	public OrderDetailsResponse updateOrder(@PathVariable String id, @RequestBody OrderDetailsRequestModel order) throws Exception{
-		
-		return null;
-	}
-	
-	@DeleteMapping(path = "/{id}")
-	public OperationStatusModel deleteOrder(@PathVariable String id) throws Exception {
-		
-		return null;
-	}
-	
-	@GetMapping()
-	public List<OrderDetailsResponse> getOrders() {
-		
-		return null;
-	}
+    @Autowired
+    private OrderService orderService;
+
+    // Get all orders
+    @GetMapping
+    public ResponseEntity<List<Order>> getAllOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    // Get a single order by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+        Order order = orderService.getOrderById(id);
+        if (order != null) {
+            return ResponseEntity.ok(order);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Create a new order
+    @PostMapping
+    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+        Order createdOrder = orderService.createOrder(order);
+        return ResponseEntity.status(201).body(createdOrder);
+    }
+
+    // Update an existing order
+    @PutMapping("/{id}")
+    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order order) {
+        Order updatedOrder = orderService.updateOrder(id, order);
+        if (updatedOrder != null) {
+            return ResponseEntity.ok(updatedOrder);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Delete an order
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        boolean isDeleted = orderService.deleteOrder(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
