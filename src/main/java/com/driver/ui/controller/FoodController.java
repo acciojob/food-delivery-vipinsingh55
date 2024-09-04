@@ -1,50 +1,64 @@
-package com.driver.ui.controller;
+package com.example.fooddelivery.controller;
+
+import com.example.fooddelivery.model.Food;
+import com.example.fooddelivery.service.FoodService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import com.driver.model.request.FoodDetailsRequestModel;
-import com.driver.model.response.FoodDetailsResponse;
-import com.driver.model.response.OperationStatusModel;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 @RestController
-@RequestMapping("/foods")
+@RequestMapping("/api/foods")
 public class FoodController {
 
-	@GetMapping(path="/{id}")
-	public FoodDetailsResponse getFood(@PathVariable String id) throws Exception{
+    @Autowired
+    private FoodService foodService;
 
-		return null;
-	}
+    // Get all food items
+    @GetMapping
+    public ResponseEntity<List<Food>> getAllFoods() {
+        List<Food> foods = foodService.getAllFoods();
+        return ResponseEntity.ok(foods);
+    }
 
-	@PostMapping("/create")
-	public FoodDetailsResponse createFood(@RequestBody FoodDetailsRequestModel foodDetails) {
+    // Get a single food item by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Food> getFoodById(@PathVariable Long id) {
+        Food food = foodService.getFoodById(id);
+        if (food != null) {
+            return ResponseEntity.ok(food);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-		return null;
-	}
+    // Create a new food item
+    @PostMapping
+    public ResponseEntity<Food> createFood(@RequestBody Food food) {
+        Food createdFood = foodService.createFood(food);
+        return ResponseEntity.status(201).body(createdFood);
+    }
 
-	@PutMapping(path="/{id}")
-	public FoodDetailsResponse updateFood(@PathVariable String id, @RequestBody FoodDetailsRequestModel foodDetails) throws Exception{
+    // Update an existing food item
+    @PutMapping("/{id}")
+    public ResponseEntity<Food> updateFood(@PathVariable Long id, @RequestBody Food food) {
+        Food updatedFood = foodService.updateFood(id, food);
+        if (updatedFood != null) {
+            return ResponseEntity.ok(updatedFood);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-		return null;
-	}
-
-	@DeleteMapping(path = "/{id}")
-	public OperationStatusModel deleteFood(@PathVariable String id) throws Exception{
-
-		return null;
-	}
-	
-	@GetMapping()
-	public List<FoodDetailsResponse> getFoods() {
-
-		return null;
-	}
+    // Delete a food item
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFood(@PathVariable Long id) {
+        boolean isDeleted = foodService.deleteFood(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
