@@ -1,51 +1,64 @@
-package com.driver.ui.controller;
+package com.example.fooddelivery.controller;
+
+import com.example.fooddelivery.model.User;
+import com.example.fooddelivery.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import com.driver.model.request.UserDetailsRequestModel;
-import com.driver.model.response.OperationStatusModel;
-import com.driver.model.response.UserResponse;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
-	@GetMapping(path = "/{id}")
-	public UserResponse getUser(@PathVariable String id) throws Exception{
+    @Autowired
+    private UserService userService;
 
-		return null;
-	}
+    // Get all users
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
 
-	@PostMapping()
-	public UserResponse createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception{
+    // Get a single user by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-		return null;
-	}
+    // Create a new user
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.status(201).body(createdUser);
+    }
 
-	@PutMapping(path = "/{id}")
-	public UserResponse updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) throws Exception{
+    // Update an existing user
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        User updatedUser = userService.updateUser(id, user);
+        if (updatedUser != null) {
+            return ResponseEntity.ok(updatedUser);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-		return null;
-	}
-
-	@DeleteMapping(path = "/{id}")
-	public OperationStatusModel deleteUser(@PathVariable String id) throws Exception{
-
-		return null;
-	}
-	
-	@GetMapping()
-	public List<UserResponse> getUsers(){
-
-		return null;
-	}
-	
+    // Delete a user
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        boolean isDeleted = userService.deleteUser(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
